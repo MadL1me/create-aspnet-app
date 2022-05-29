@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Create-aspnet-app", "Create-aspnet-app\Create-aspnet-app.csproj", "{ACA0A8A7-D2D2-48D9-919E-F4EB8D6C25EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{0748A472-4E09-47E0-8D34-75C599EF0041}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ACA0A8A7-D2D2-48D9-919E-F4EB8D6C25EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACA0A8A7-D2D2-48D9-919E-F4EB8D6C25EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACA0A8A7-D2D2-48D9-919E-F4EB8D6C25EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACA0A8A7-D2D2-48D9-919E-F4EB8D6C25EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0748A472-4E09-47E0-8D34-75C599EF0041}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0748A472-4E09-47E0-8D34-75C599EF0041}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0748A472-4E09-47E0-8D34-75C599EF0041}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0748A472-4E09-47E0-8D34-75C599EF0041}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
