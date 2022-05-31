@@ -1,7 +1,10 @@
 using System.Threading.Tasks;
 using CliFx.Infrastructure;
 using Create_aspnet_app.Commands;
+using Moq;
 using NUnit.Framework;
+using Sharprompt;
+using Sharprompt.Prompts;
 
 namespace Tests;
 
@@ -17,11 +20,13 @@ public class Tests
     {
         using var console = new FakeInMemoryConsole();
 
-        var command = new ConcatCommand
-        {
-            Left = "foo",
-            Right = "bar"
-        };
+        var mock = new Mock<IPrompt>();
+        mock.Setup(p => p.Input<string>("What's your name?", 
+            null, null, null)).Returns("MadL1me");
+        
+        Prompt.PromptRealisation = mock.Object;
+        
+        var command = new CreateWebAppCommand();
 
         // Act
         await command.ExecuteAsync(console);
@@ -29,7 +34,7 @@ public class Tests
         var stdOut = console.ReadOutputString();
 
         // Assert
-        Assert.That(stdOut, Is.EqualTo("foo bar"));
+        Assert.That(stdOut, Is.EqualTo("Hello, MadL1me!\r\n"));
     }
 }
 
