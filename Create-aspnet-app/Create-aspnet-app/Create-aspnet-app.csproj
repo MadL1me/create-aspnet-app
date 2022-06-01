@@ -11,16 +11,13 @@
 
     <ItemGroup>
       <PackageReference Include="CliFx" Version="2.2.5" />
+      <PackageReference Include="CliWrap" Version="3.4.4" />
     </ItemGroup>
 
     <ItemGroup>
       <Reference Include="Sharprompt">
         <HintPath>..\..\..\..\Sharpprompt\Sharprompt\Sharprompt\bin\Release\netstandard2.0\Sharprompt.dll</HintPath>
       </Reference>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Utils" />
     </ItemGroup>
 
 </Project>

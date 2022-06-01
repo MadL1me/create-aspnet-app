@@ -4,3 +4,4 @@ await new CliApplicationBuilder()
     .AddCommandsFromThisAssembly()
     .Build()
     .RunAsync();
+
