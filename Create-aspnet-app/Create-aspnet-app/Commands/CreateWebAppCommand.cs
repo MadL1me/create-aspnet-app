@@ -29,7 +29,8 @@ public class CreateWebAppCommand : ICommand
     public async ValueTask ExecuteAsync(IConsole console)
     {
         var prompt = Prompt.PromptRealisation;
-        await console.Output.WriteLineAsync("Welcome To Create-aspnet-app!");
+
+        await console.Output.WriteLineAsyncWithColors("Welcome To Create-aspnet-app!", ConsoleColor.DarkCyan);
 
         await ConfigureName(prompt, _builderData);
         await RunDotnetNewCommand(console);
@@ -42,7 +43,7 @@ public class CreateWebAppCommand : ICommand
         const string optionName = "-o";
         var projectName = prompt.Input<string>("Choose name for your project");
         data.CliArguments.Add(optionName);
-        data.CliArguments.Add("aboba");
+        data.CliArguments.Add(projectName);
         return default;
     }
 
@@ -50,7 +51,6 @@ public class CreateWebAppCommand : ICommand
     {
         var commandResult = await Cli.Wrap($"{DotnetCommandName}")
             .WithArguments(_builderData.CliArguments)
-            .WithWorkingDirectory(Directory.GetCurrentDirectory() + "/SomeDirectory")
             .ExecuteBufferedAsync();
         
         await console.Output.WriteAsync(commandResult.StandardOutput);
