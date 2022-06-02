@@ -1,5 +1,4 @@
-﻿using System.Text;
-using CliFx;
+﻿using CliFx;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
 using CliWrap;

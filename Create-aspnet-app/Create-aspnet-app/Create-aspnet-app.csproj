@@ -7,6 +7,13 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+
+        <PackageId>create-aspnet-app</PackageId>
+        <Version>0.0.1</Version>
+        <Authors>Ilya Klimenko</Authors>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>create-aspnet-app</ToolCommandName>
+        <PackageOutputPath>./nupkg</PackageOutputPath>
     </PropertyGroup>
 
     <ItemGroup>
