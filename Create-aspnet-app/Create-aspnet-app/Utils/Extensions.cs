@@ -28,11 +28,6 @@ public static class Extensions
         writer.Console.ForegroundColor = originalForegroundColor;
     }
 
-    public static async Task WriteLineAsyncIfDebug()
-    {
-        
-    }
-
     /// <summary>
     /// Returns index of first successful predicate or null if not found any
     /// </summary>
