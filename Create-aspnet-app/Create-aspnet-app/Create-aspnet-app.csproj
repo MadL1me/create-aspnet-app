@@ -10,10 +10,11 @@
 
         <PackageId>create-aspnet-app</PackageId>
         <Version>0.0.1</Version>
-        <Authors>Ilya Klimenko</Authors>
+        <Authors>Ilya Klimenko (MadL1me)</Authors>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>create-aspnet-app</ToolCommandName>
         <PackageOutputPath>./nupkg</PackageOutputPath>
+        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
