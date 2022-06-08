@@ -29,7 +29,7 @@ public class CreateWebAppCommand : ICommand
 
         await console.Output.WriteLineAsyncWithColors("Welcome To Create-aspnet-app!", ConsoleColor.Cyan);
 
-        await HandleTemplateVersions(console);
+        await HandleTemplateVersions(console); 
 
         await ConfigureName(prompt, _builderData);
         
@@ -41,11 +41,22 @@ public class CreateWebAppCommand : ICommand
     private async Task HandleTemplateVersions(IConsole console)
     {
         if (await CheckIfTemplateExists(console))
-        { 
-            if (await GetTemplateVersion(console) != AspAwesomeTemplateRequiredVersion)
+        {
+            var installedVersion = await GetTemplateVersion(console);
+            await console.Output.WriteLineAsync($@"Found installed template with version: {installedVersion}");
+            
+            if (installedVersion != AspAwesomeTemplateRequiredVersion)
+            {
+                await console.Output.WriteLineAsync(
+                    $"Installed wrong template version, installing required version: {AspAwesomeTemplateRequiredVersion}");
                 await InstallRequiredTemplateVersion(console);
+            }
+            
+            return;
         }
-        else await InstallRequiredTemplateVersion(console);
+
+        await console.Output.WriteLineAsync($"Template nuget package is not found, installing required version: {AspAwesomeTemplateRequiredVersion}");
+        await InstallRequiredTemplateVersion(console);
     }
     
     private async Task InstallRequiredTemplateVersion(IConsole console)
@@ -56,7 +67,7 @@ public class CreateWebAppCommand : ICommand
             .WithArguments($"{DotnetNewCommandName} {install} {TemplatePackageId}::{AspAwesomeTemplateRequiredVersion}")
             .ExecuteBufferedAsync();
 
-        await console.Output.WriteAsync(commandResult.StandardOutput);
+        await console.Output.WriteLineAsync($"Successfully installed: {TemplatePackageId}::{AspAwesomeTemplateRequiredVersion}");
     }
     
     private ValueTask ConfigureName(IPrompt prompt, BuilderData data)
@@ -97,10 +108,7 @@ public class CreateWebAppCommand : ICommand
             .WithValidation(CommandResultValidation.None)
             .ExecuteBufferedAsync();
         
-        await console.Output.WriteAsync(commandResult.StandardOutput);
-        await console.Output.WriteAsync(commandResult.StandardError);
-
-        return commandResult.StandardError.Length != 0;
+        return commandResult.ExitCode is 0;
     }
 
     private async Task RunDotnetNewCommand(IConsole console)
