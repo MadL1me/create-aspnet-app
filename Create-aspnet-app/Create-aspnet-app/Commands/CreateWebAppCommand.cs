@@ -3,30 +3,23 @@ using CliFx.Attributes;
 using CliFx.Infrastructure;
 using CliWrap;
 using CliWrap.Buffered;
-using CliWrap.Exceptions;
 using Create_aspnet_app.Utils;
 using Sharprompt;
 using Sharprompt.Prompts;
 
 namespace Create_aspnet_app.Commands;
 
-public class BuilderData
-{
-    public string ProjectName { get; init; }
-    
-    public readonly List<string> CliArguments = new();
-}
-
 [Command]
 public class CreateWebAppCommand : ICommand
 {
-    public const string AppVersion = "0.0.2";
-    public const string AspAwesomeTemplateRequiredVersion = "0.0.2";
+    private const string AppVersion = "0.0.2";
+    private const string AspAwesomeTemplateRequiredVersion = "0.0.2";
     
-    public const string DotnetCommandName = "dotnet";
-    public const string DotnetNewCommandName = "new";
-    public const string TemplateShortName = "asp-awesome-main-cli";
-    public const string TemplatePackageId = "Asp.AwesomeTemplates.Main.Cli";
+    private const string DotnetCommandName = "dotnet";
+    private const string DotnetNewCommandName = "new";
+    
+    private const string TemplateShortName = "asp-awesome-main-cli";
+    private const string TemplatePackageId = "Asp.AwesomeTemplates.Main.Cli";
     
     private readonly BuilderData _builderData = new () { CliArguments = { DotnetNewCommandName, TemplateShortName } };
     
@@ -34,27 +27,33 @@ public class CreateWebAppCommand : ICommand
     {
         var prompt = Prompt.PromptRealisation;
 
-        await console.Output.WriteLineAsyncWithColors("Welcome To Create-aspnet-app!", ConsoleColor.DarkCyan);
+        await console.Output.WriteLineAsyncWithColors("Welcome To Create-aspnet-app!", ConsoleColor.Cyan);
 
+        await HandleTemplateVersions(console);
+
+        await ConfigureName(prompt, _builderData);
+        
+        await RunDotnetNewCommand(console);
+
+        await console.Output.WriteLineAsync($"Your project {_builderData.ProjectName} was successfully created!");
+    }
+
+    private async Task HandleTemplateVersions(IConsole console)
+    {
         if (await CheckIfTemplateExists(console))
         { 
             if (await GetTemplateVersion(console) != AspAwesomeTemplateRequiredVersion)
                 await InstallRequiredTemplateVersion(console);
         }
         else await InstallRequiredTemplateVersion(console);
-
-        //await ConfigureName(prompt, _builderData);
-        //await RunDotnetNewCommand(console);
-
-        await console.Output.WriteLineAsync($"Your project {_builderData.ProjectName} was successfully created!");
     }
-
-    private async ValueTask InstallRequiredTemplateVersion(IConsole console)
+    
+    private async Task InstallRequiredTemplateVersion(IConsole console)
     {
         const string install = "--install";
         
         var commandResult = await Cli.Wrap($"{DotnetCommandName}")
-            .WithArguments(new [] {DotnetNewCommandName, install, TemplatePackageId + "::" + AspAwesomeTemplateRequiredVersion})
+            .WithArguments($"{DotnetNewCommandName} {install} {TemplatePackageId}::{AspAwesomeTemplateRequiredVersion}")
             .ExecuteBufferedAsync();
 
         await console.Output.WriteAsync(commandResult.StandardOutput);
@@ -69,7 +68,7 @@ public class CreateWebAppCommand : ICommand
         return default;
     }
     
-    private async ValueTask<string> GetTemplateVersion(IConsole console)
+    private async Task<string> GetTemplateVersion(IConsole console)
     {
         const string helpArg = "-u";
         
@@ -89,7 +88,7 @@ public class CreateWebAppCommand : ICommand
         return version;
     }
     
-    private async ValueTask<bool> CheckIfTemplateExists(IConsole console)
+    private async Task<bool> CheckIfTemplateExists(IConsole console)
     {
         const string helpArg = "-h";
         
@@ -104,12 +103,19 @@ public class CreateWebAppCommand : ICommand
         return commandResult.StandardError.Length != 0;
     }
 
-    private async ValueTask RunDotnetNewCommand(IConsole console)
+    private async Task RunDotnetNewCommand(IConsole console)
     {
         var commandResult = await Cli.Wrap($"{DotnetCommandName}")
             .WithArguments(_builderData.CliArguments)
             .ExecuteBufferedAsync();
         
         await console.Output.WriteAsync(commandResult.StandardOutput);
+    }
+    
+    private class BuilderData
+    {
+        public string ProjectName { get; init; }
+    
+        public readonly List<string> CliArguments = new();
     }
 }
