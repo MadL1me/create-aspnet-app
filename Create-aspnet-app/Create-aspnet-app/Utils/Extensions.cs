@@ -16,16 +16,8 @@ public static class Extensions
     public static async Task WriteLineAsyncWithColors(this ConsoleWriter writer, string value, 
         ConsoleColor foregroundColor = ConsoleColor.Gray, ConsoleColor backgroundColor = ConsoleColor.Black)
     {
-        var originalBackgroundColor = writer.Console.BackgroundColor;
-        var originalForegroundColor = writer.Console.ForegroundColor;
-
-        writer.Console.BackgroundColor = backgroundColor;
-        writer.Console.ForegroundColor = foregroundColor;
-        
+        using var disposable = writer.Console.WithColors(foregroundColor, backgroundColor);
         await writer.Console.Output.WriteLineAsync(value);
-
-        writer.Console.BackgroundColor = originalBackgroundColor;
-        writer.Console.ForegroundColor = originalForegroundColor;
     }
 
     /// <summary>
