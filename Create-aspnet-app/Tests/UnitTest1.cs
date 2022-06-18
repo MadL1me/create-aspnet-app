@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using CliFx.Infrastructure;
-using Create_aspnet_app.Commands;
+using CreateAspnetApp.Commands;
 using Moq;
 using NUnit.Framework;
 using Sharprompt;

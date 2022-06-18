@@ -3,17 +3,17 @@ using CliFx.Attributes;
 using CliFx.Infrastructure;
 using CliWrap;
 using CliWrap.Buffered;
-using Create_aspnet_app.Utils;
+using CreateAspnetApp.Utils;
 using Sharprompt;
 using Sharprompt.Prompts;
 
-namespace Create_aspnet_app.Commands;
+namespace CreateAspnetApp.Commands;
 
 [Command]
 public class CreateWebAppCommand : ICommand
 {
-    private const string AppVersion = "0.0.2";
-    private const string AspAwesomeTemplateRequiredVersion = "0.0.2";
+    private const string AppVersion = "0.2.0";
+    private const string AspAwesomeTemplateRequiredVersion = "0.2.0";
     
     private const string DotnetCommandName = "dotnet";
     private const string DotnetNewCommandName = "new";
@@ -21,23 +21,25 @@ public class CreateWebAppCommand : ICommand
     private const string TemplateShortName = "asp-awesome-main-cli";
     private const string TemplatePackageId = "Asp.AwesomeTemplates.Main.Cli";
     
-    private readonly BuilderData _builderData = new () { CliArguments = { DotnetNewCommandName, TemplateShortName } };
+    private readonly BuilderData _builderData = new ();
     
     public async ValueTask ExecuteAsync(IConsole console)
     {
         var prompt = Prompt.PromptRealisation;
 
-        await console.Output.WriteLineAsyncWithColors("Welcome To Create-aspnet-app!", ConsoleColor.Cyan);
+        await console.Output.WriteLineAsyncWithColors($"Welcome To Create-aspnet-app! Version: {AppVersion}", ConsoleColor.Cyan);
 
         await HandleTemplateVersions(console); 
 
         await ConfigureName(prompt, _builderData);
+        await ConfigureSwagger(prompt, _builderData);
+        await ConfiguteSpaFramework(prompt, _builderData);
         
         await RunDotnetNewCommand(console);
 
-        await console.Output.WriteLineAsync($"Your project {_builderData.ProjectName} was successfully created!");
+        await console.Output.WriteLineAsync($"Your project {_builderData.ProjectName.Value} was successfully created!");
     }
-
+    
     private async Task HandleTemplateVersions(IConsole console)
     {
         if (await CheckIfTemplateExists(console))
@@ -63,7 +65,7 @@ public class CreateWebAppCommand : ICommand
     {
         const string install = "--install";
         
-        var commandResult = await Cli.Wrap($"{DotnetCommandName}")
+        await Cli.Wrap($"{DotnetCommandName}")
             .WithArguments($"{DotnetNewCommandName} {install} {TemplatePackageId}::{AspAwesomeTemplateRequiredVersion}")
             .ExecuteBufferedAsync();
 
@@ -72,10 +74,34 @@ public class CreateWebAppCommand : ICommand
     
     private ValueTask ConfigureName(IPrompt prompt, BuilderData data)
     {
-        const string optionName = "-o";
-        var projectName = prompt.Input<string>("Choose name for your project");
-        data.CliArguments.Add(optionName);
-        data.CliArguments.Add(projectName);
+        var projectName = prompt.Input<string>(
+            "Choose name for your project", 
+            "MyAwesomeProject", 
+            "Type your project name");
+        
+        data.ProjectName = data.ProjectName.WithValue(projectName);
+        return default;
+    }
+
+    private ValueTask ConfigureSwagger(IPrompt prompt, BuilderData data)
+    {
+        var useSwagger = prompt.Select(
+            "Use swagger for back-end API?", 
+            new [] { YesNoAnswer.Yes, YesNoAnswer.No }, 
+            defaultValue: YesNoAnswer.Yes);
+        
+        data.UseSwagger = data.UseSwagger.WithValue(useSwagger == YesNoAnswer.Yes);
+        return default;
+    }
+
+    private ValueTask ConfiguteSpaFramework(IPrompt prompt, BuilderData data)
+    {
+        var spaType = prompt.Select(
+            "Select your front-end SPA framework, or NONE option if you don't want to use any",
+            new [] {SpaFrameworkType.React, SpaFrameworkType.None }, 
+            defaultValue: SpaFrameworkType.None);
+
+        data.SpaType = data.SpaType.WithValue(spaType);
         return default;
     }
     
@@ -91,7 +117,7 @@ public class CreateWebAppCommand : ICommand
         var nameNumber = lines.IndexOfOrNull(s => s.Contains(TemplatePackageId));
 
         if (nameNumber is null)
-            throw new KeyNotFoundException("Founded value is not found");
+            throw new KeyNotFoundException("Found value is not found");
         
         var version = lines[nameNumber.Value + 1]
             .Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries)[1];
@@ -114,7 +140,7 @@ public class CreateWebAppCommand : ICommand
     private async Task RunDotnetNewCommand(IConsole console)
     {
         var commandResult = await Cli.Wrap($"{DotnetCommandName}")
-            .WithArguments(_builderData.CliArguments)
+            .WithArguments(new [] { DotnetNewCommandName, TemplateShortName, _builderData.ToCliArguments().ToStringValues() }, false)
             .ExecuteBufferedAsync();
         
         await console.Output.WriteAsync(commandResult.StandardOutput);
@@ -122,8 +148,51 @@ public class CreateWebAppCommand : ICommand
     
     private class BuilderData
     {
-        public string ProjectName { get; init; }
+        public CliOption<string> ProjectName { get; set; } = ("-o", "MyAwesomeProject");
+       
+        public CliOption<SpaFrameworkType> SpaType { get; set; } = ("-U", SpaFrameworkType.None);
+
+        public CliOption<bool> UseSwagger { get; set; } = ("-E", true);
+
+        public string[] ToCliArguments()
+        {
+            var cliArguments = new List<string>
+            {
+                ProjectName.ToCliParamsString(),
+                SpaType.ToCliParamsString()
+            };
+
+            return cliArguments.ToArray();
+        }
+    }
     
-        public readonly List<string> CliArguments = new();
+    private record struct CliOption<TValue> 
+    {
+        public string OptionName { get; set; }
+        
+        public TValue Value { get; set; }
+        
+        public string ToCliParamsString() => $"{OptionName} {Value}";
+
+        public CliOption<TValue> WithValue(TValue value) => this with { Value = value };
+        
+        public static implicit operator TValue(CliOption<TValue> option) => option.Value;
+
+        public static implicit operator CliOption<TValue>(TValue value) => new () { Value = value };
+        
+        public static implicit operator CliOption<TValue>((string optionName, TValue value) valueTuple) =>
+            new () { Value = valueTuple.value, OptionName = valueTuple.optionName};
+    }
+
+    private enum SpaFrameworkType
+    {
+        React,
+        None
+    }
+
+    private enum YesNoAnswer
+    {
+        Yes,
+        No
     }
 }

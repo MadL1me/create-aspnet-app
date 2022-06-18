@@ -1,6 +1,8 @@
+using System.Collections;
+using System.Text;
 using CliFx.Infrastructure;
 
-namespace Create_aspnet_app.Utils;
+namespace CreateAspnetApp.Utils;
 
 public static class Extensions
 {
@@ -37,5 +39,18 @@ public static class Extensions
         }
 
         return null;
+    }
+
+    public static string ToStringValues(this IList<string> list)
+    {
+        var sb = new StringBuilder();
+
+        foreach (var element in list)
+        {
+            sb.Append(element);
+            sb.Append(' ');
+        }
+        
+        return sb.ToString();
     }
 }
