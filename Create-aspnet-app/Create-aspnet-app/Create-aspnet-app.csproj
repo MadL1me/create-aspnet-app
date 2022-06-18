@@ -9,7 +9,7 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 
         <PackageId>create-aspnet-app</PackageId>
-        <Version>0.0.2</Version>
+        <Version>0.2.0</Version>
         <Authors>Ilya Klimenko (MadL1me)</Authors>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>create-aspnet-app</ToolCommandName>
