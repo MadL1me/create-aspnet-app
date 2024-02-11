@@ -20,7 +20,7 @@ Cli tool is currently supported as [dotnet tool](https://docs.microsoft.com/en-u
 1. Install tool as dotnet tool:
 
 ```sh
-dotnet tool install --global create-aspnet-app --version 0.0.2
+dotnet tool install --global create-aspnet-app --version 0.2.0
 ```
 
 2. Run create-asp-net app as cli: 
